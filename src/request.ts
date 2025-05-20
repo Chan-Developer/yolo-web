@@ -1,6 +1,6 @@
 import axios from "axios";
 
-alert(process.env.NODE_ENV);
+// alert(process.env.NODE_ENV);
 
 const myAxios = axios.create({
   // 区分开发和线上环境

@@ -46,7 +46,11 @@
         <a-form-item
           label="用户名"
           name="userAccount"
-          :rules="[{ required: true, message: '请输入用户名!' }]"
+          :rules="[
+            { required: true, message: '请输入用户名!' },
+            { min: 6, message: '用户名不能小于 6 位' },
+            { max: 16, message: '用户名不能大于 16 位' },
+          ]"
         >
           <a-input v-model:value="userForm.userAccount" />
         </a-form-item>
@@ -54,7 +58,11 @@
         <a-form-item
           label="密码"
           name="userPassword"
-          :rules="[{ required: isAddMode, message: '请输入密码!' }]"
+          :rules="[
+            { required: isAddMode, message: '请输入密码!' },
+            { min: 8, message: '密码不能小于 8 位' },
+            { max: 16, message: '密码不能大于 16 位' },
+          ]"
         >
           <a-input-password v-model:value="userForm.userPassword" />
         </a-form-item>
@@ -80,6 +88,7 @@ import {
   addUser,
   updateUser,
 } from "@/api/user";
+// import { min } from "date-fns";
 import { useLoginUserStore } from "@/store/useLoginUserStore";
 import { useRouter } from "vue-router";
 
@@ -183,13 +192,30 @@ const showEditUserModal = (record) => {
     id: record.id,
     userAccount: record.userAccount,
     userPassword: "", // 编辑用户时不回显密码
-    userRole: record.userRole || "user",
+    userRole: record.userRole !== undefined ? record.userRole : 0,
   };
   modalVisible.value = true;
 };
 
 // 处理模态框确认
 const handleModalOk = async () => {
+  // 验证用户名长度
+  if (
+    userForm.value.userAccount.length < 6 ||
+    userForm.value.userAccount.length > 16
+  ) {
+    message.error("用户名长度必须在 6 到 16 位之间");
+    return;
+  }
+  // 验证密码长度
+  if (
+    userForm.value.userPassword.length < 8 ||
+    userForm.value.userPassword.length > 16
+  ) {
+    message.error("密码长度必须在 8 到 16 位之间");
+    return;
+  }
+
   if (!userForm.value.userAccount) {
     message.error("用户名不能为空");
     return;
@@ -204,14 +230,8 @@ const handleModalOk = async () => {
     // 创建一个新对象用于API请求
     const userData = { ...userForm.value };
 
-    // 角色字段转换
-    if (userData.userRole === "admin") {
-      userData.userRole = 1;
-    } else if (userData.userRole === "user") {
-      userData.userRole = 0;
-    }
-
     let response;
+
     if (isAddMode.value) {
       response = await addUser(userData);
     } else {
@@ -259,7 +279,7 @@ const columns = [
     dataIndex: "userRole",
     key: "userRole",
     customRender: ({ text }) => {
-      return text === 0 ? "管理员" : "普通用户";
+      return text === 1 ? "管理员" : "普通用户";
     },
   },
   {

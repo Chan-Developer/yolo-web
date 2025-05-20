@@ -105,18 +105,23 @@ const baseItems = [
     icon: () => h(RobotOutlined),
     label: h(
       "a",
-      { href: "https://chat.deepseek.com/", target: "_blank" },
+      {
+        href: "https://chat.deepseek.com/",
+        target: "_blank",
+        rel: "noopener noreferrer",
+        onClick: (e) => e.stopPropagation(), // 阻止事件冒泡
+      },
       "智能助手"
     ),
     title: "智能助手",
   },
-  {
-    key: "/user/uploadHistory",
-    icon: () => h(UploadOutlined),
-    label: "上传历史",
-    title: "上传历史",
-    requireLogin: true, // 标记需要登录才显示
-  },
+  // {
+  //   key: "/user/uploadHistory",
+  //   icon: () => h(UploadOutlined),
+  //   label: "上传历史",
+  //   title: "上传历史",
+  //   requireLogin: true, // 标记需要登录才显示
+  // },
 ];
 
 // 添加空值检查的计算属性
